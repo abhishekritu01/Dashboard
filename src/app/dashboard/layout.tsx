@@ -1,142 +1,238 @@
-import React, { ReactNode } from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
+'use client'
 
-type LayoutProps = {
-  children: ReactNode;
-};
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  TransitionChild,
+} from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import {
+  Bars3Icon,
+  BellIcon,
+  CalendarIcon,
+  ChartPieIcon,
+  Cog6ToothIcon,
+  DocumentDuplicateIcon,
+  FolderIcon,
+  HomeIcon,
+  UsersIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
+import clsx from 'clsx'
+import { useState } from 'react'
 
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-};
+interface NavigiationItem {
+  name: string
+  href: string
+  icon: any
+  current: boolean
+}
 
-const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  // { name: 'Projects', href: '#', current: false },
-  // { name: 'Calendar', href: '#', current: false },
-  // { name: 'Reports', href: '#', current: false },
-];
+const navigation: NavigiationItem[] = [
+  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
+  { name: 'Team', href: '#', icon: UsersIcon, current: false },
+  { name: 'Projects', href: '#', icon: FolderIcon, current: false },
+  { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
+  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+]
+
+const teams = [
+  { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
+  { id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
+  { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
+]
 
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
+  { name: 'Your profile', href: '#' },
   { name: 'Sign out', href: '#' },
-];
+]
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+interface LayoutProps {
+  children: React.ReactNode;  // Correctly typing the 'children' prop
+}
+
+const Layout = ({ children }: LayoutProps) => {  // Passing 'children' as a prop
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Added state for dropdown visibility
+
   return (
-    <div className="min-h-full">
-      <Disclosure as="nav" className="bg-gray-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <div className="shrink-0">
+    <>
+      {/* Dialog for sidebar in mobile */}
+      <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
+        />
+        <div className="fixed inset-0 flex">
+          <DialogPanel
+            transition
+            className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-[closed]:-translate-x-full"
+          >
+            <TransitionChild>
+              <div className="absolute left-full top-0 flex w-16 justify-center pt-5 duration-300 ease-in-out data-[closed]:opacity-0">
+                <button type="button" onClick={() => setSidebarOpen(false)} className="-m-2.5 p-2.5">
+                  <span className="sr-only">Close sidebar</span>
+                  <XMarkIcon aria-hidden="true" className="size-6 text-white" />
+                </button>
+              </div>
+            </TransitionChild>
+            {/* Sidebar content */}
+            <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
+              <div className="flex h-16 shrink-0 items-center">
                 <img
                   alt="Your Company"
                   src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                  className="h-8 w-8"
+                  className="h-8 w-auto"
                 />
               </div>
-              <div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
+              <nav className="flex flex-1 flex-col">
+                <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                  <li>
+                    <ul role="list" className="-mx-2 space-y-1">
+                      {navigation.map((item) => (
+                        <li key={item.name}>
+                          <a
+                            href={item.href}
+                            className={clsx(
+                              item.current
+                                ? 'bg-gray-800 text-white'
+                                : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                              'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                            )}
+                          >
+                            <item.icon aria-hidden="true" className="size-6 shrink-0" />
+                            {item.name}
+                          </a>
+                          {item.current && dropdownOpen && (
+                            <div className="absolute left-0 mt-2 w-full bg-gray-800 rounded-md shadow-lg">
+                              <Menu as="div">
+                                <MenuButton className="block text-white p-2">Dropdown</MenuButton>
+                                <MenuItems className="py-1">
+                                  <MenuItem>
+                                    <a href="#" className="block p-2 text-gray-100 hover:bg-gray-700">Option 1</a>
+                                  </MenuItem>
+                                  <MenuItem>
+                                    <a href="#" className="block p-2 text-gray-100 hover:bg-gray-700">Option 2</a>
+                                  </MenuItem>
+                                </MenuItems>
+                              </Menu>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      {/* Static sidebar for desktop */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
+          <div className="flex h-16 shrink-0 items-center">
+            <img
+              alt="Your Company"
+              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
+              className="h-8 w-auto"
+            />
+          </div>
+          <nav className="flex flex-1 flex-col">
+            <ul role="list" className="flex flex-1 flex-col gap-y-7">
+              <li>
+                <ul role="list" className="-mx-2 space-y-1">
                   {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      aria-current={item.current ? 'page' : undefined}
-                      className={clsx(
-                        item.current
-                          ? 'bg-gray-900 text-white'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'rounded-md px-3 py-2 text-sm font-medium'
+                    <li key={item.name}>
+                      <a
+                        href={item.href}
+                        className={clsx(
+                          item.current
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                          'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                        )}
+                      >
+                        <item.icon aria-hidden="true" className="size-6 shrink-0" />
+                        {item.name}
+                      </a>
+                      {item.current && dropdownOpen && (
+                        <div className="absolute left-0 mt-2 w-full bg-gray-800 rounded-md shadow-lg">
+                          <Menu as="div">
+                            <MenuButton className="block text-white p-2">Dropdown</MenuButton>
+                            <MenuItems className="py-1">
+                              <MenuItem>
+                                <a href="#" className="block p-2 text-gray-100 hover:bg-gray-700">Option 1</a>
+                              </MenuItem>
+                              <MenuItem>
+                                <a href="#" className="block p-2 text-gray-100 hover:bg-gray-700">Option 2</a>
+                              </MenuItem>
+                            </MenuItems>
+                          </Menu>
+                        </div>
                       )}
-                    >
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-72">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+          <button type="button" onClick={() => setSidebarOpen(true)} className="-m-2.5 p-2.5 lg:hidden">
+            <span className="sr-only">Open sidebar</span>
+            <Bars3Icon aria-hidden="true" className="size-6 text-gray-500" />
+          </button>
+
+          <div className="flex flex-1 items-center justify-center gap-x-4 sm:max-w-xs sm:flex-1 sm:justify-center lg:max-w-none">
+            {/* Search section (optional) */}
+          </div>
+
+          <div className="flex gap-x-4 lg:gap-x-6">
+            <button type="button" className="-m-2.5 p-2.5">
+              <span className="sr-only">View notifications</span>
+              <BellIcon aria-hidden="true" className="size-6 text-gray-500" />
+            </button>
+
+            <Menu as="div" className="relative flex items-center">
+              <MenuButton className="-m-2.5 flex items-center gap-x-2 p-2.5 text-gray-400 hover:text-gray-500">
+                <span className="sr-only">Open user menu</span>
+                <img
+                  src="https://images.unsplash.com/photo-1501594907359-38c5a05ffea0?crop=faces&fit=crop&h=32&w=32"
+                  alt=""
+                  className="h-8 w-8 rounded-full"
+                />
+                <ChevronDownIcon aria-hidden="true" className="size-5 text-gray-500" />
+              </MenuButton>
+              <MenuItems className="absolute right-0 z-10 mt-32 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                {userNavigation.map((item) => (
+                  <MenuItem key={item.name}>
+                    <a href={item.href} className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100">
                       {item.name}
                     </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <div className="ml-4 flex items-center md:ml-6">
-                <button
-                  type="button"
-                  className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-
-                <Menu as="div" className="relative ml-3">
-                  <div>
-                    <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                      <img alt="User" src={user.imageUrl} className="h-8 w-8 rounded-full" />
-                    </MenuButton>
-                  </div>
-                  <MenuItems
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                  >
-                    {userNavigation.map((item) => (
-                      <MenuItem key={item.name}>
-                        <a
-                          href={item.href}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {item.name}
-                        </a>
-                      </MenuItem>
-                    ))}
-                  </MenuItems>
-                </Menu>
-              </div>
-            </div>
-            <div className="-mr-2 flex md:hidden">
-              <DisclosureButton className="inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                <XMarkIcon className="hidden h-6 w-6" aria-hidden="true" />
-              </DisclosureButton>
-            </div>
+                  </MenuItem>
+                ))}
+              </MenuItems>
+            </Menu>
           </div>
         </div>
 
-        <DisclosurePanel className="md:hidden">
-          <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            {navigation.map((item) => (
-              <DisclosureButton
-                key={item.name}
-                as="a"
-                href={item.href}
-                className={clsx(
-                  item.current
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'block rounded-md px-3 py-2 text-base font-medium'
-                )}
-              >
-                {item.name}
-              </DisclosureButton>
-            ))}
-          </div>
-        </DisclosurePanel>
-      </Disclosure>
-
-      <header className="bg-white shadow">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-        </div>
-      </header>
-      <main>
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <main>
           {children}
-        </div>
-      </main>
-    </div>
-  );
-};
-
-export default Layout;
+        </main>
+      </div>
+    </>
+  )
+} 
+export default Layout
