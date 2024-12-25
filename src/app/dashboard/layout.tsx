@@ -36,10 +36,7 @@ interface NavigiationItem {
 const navigation: NavigiationItem[] = [
   { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
   { name: 'Team', href: '#', icon: UsersIcon, current: false },
-  { name: 'Projects', href: '#', icon: FolderIcon, current: false },
-  { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+  
 ]
 
 const teams = [
@@ -228,7 +225,7 @@ const Layout = ({ children }: LayoutProps) => {  // Passing 'children' as a prop
           </div>
         </div>
 
-        <main>
+        <main className="relative z-0 flex-1 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>
