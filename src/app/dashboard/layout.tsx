@@ -14,14 +14,9 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
   HomeIcon,
   UsersIcon,
-  XMarkIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
 import { useState } from 'react'
@@ -57,6 +52,10 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {  // Passing 'children' as a prop
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false); // Added state for dropdown visibility
+
+  const logout = () => {
+    // Your logout logic here
+  }
 
   return (
     <>
